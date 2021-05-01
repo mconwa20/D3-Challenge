@@ -54,13 +54,13 @@ function renderXAxes(newXScale, xAxis) {
 }
 
 // function used for updating y-scale var upon click on axis label
-function yScale(data, chosenYAxis, chartHeight) {
+function yScale(data, chosenYAxis, height) {
   // create scales
   var yLinearScale = d3.scaleLinear()
     .domain([d3.min(data, d => d[chosenYAxis]) * 0.8,
       d3.max(data, d => d[chosenYAxis]) * 1.2
     ])
-    .range([chartHeight, 0]);
+    .range([height, 0]);
 
   return yLinearScale;
 
@@ -132,6 +132,111 @@ textGroup
   return circlesGroup;
 }
 
+// The code for the chart is wrapped inside a function that
+// automatically resizes the chart
+function makeResponsive() {
+
+  // if the SVG area isn't empty when the browser loads,
+  // remove it and replace it with a resized version of the chart
+  var svgArea = d3.select("#scatter").select("svg");
+
+  // clear svg is not empty
+  if (!svgArea.empty()) {
+    svgArea.remove();
+  }
+
+  // SVG wrapper dimensions are determined by the current width and
+  // height of the browser window.
+  var svgWidth = window.innerWidth/1.2;
+  var svgHeight = window.innerHeight/1.7;
+
+  var margin = {
+    top: 50,
+    bottom: 50,
+    right: 50,
+    left: 50
+  };
+
+  var height = svgHeight - margin.top - margin.bottom;
+  var width = svgWidth - margin.left - margin.right;
+
+  // Append SVG element
+  var svg = d3
+    .select("#scatter")
+    .append("svg")
+    .attr("height", svgHeight)
+    .attr("width", svgWidth);
+
+  // Append group element
+  var chartGroup = svg.append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  // Read CSV
+  d3.csv("assets/data/data.csv").then(function(demoData, err) {
+
+    if (err) throw err;
+
+      // parse data
+      data.forEach(function(data) {
+        data.poverty = +data.poverty;
+        data.healthcare = +data.healthcare;
+      });
+
+      // create scales
+      var xLinearScale = xScale(demoData, chosenXAxis, chartWidth, chartHeight)
+      var yLinearScale = yScale(demoData, chosenYAxis, chartWidth, chartHeight)
+
+      // create axes
+      var xAxis = chartGroup.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(bottomAxis);
+
+      var yAxis = chartGroup.append("g")
+        .call(leftAxis);
+
+      // append circles
+      var circlesGroup = chartGroup.selectAll("circle")
+        .data(demoData);
+        .enter()
+        .append("g")
+
+
+        var circles = circlesGroup.append("circle")
+        .data(demoData);
+        .enter()
+        .append("g")
+
+      // Date formatter to display dates nicely
+      var dateFormatter = d3.timeFormat("%d-%b");
+
+      // Step 1: Initialize Tooltip
+
+      // Step 2: Create the tooltip in chartGroup.
+
+      // Step 3: Create "mouseover" event listener to display tooltip
+
+      // Step 4: Create "mouseout" event listener to hide tooltip
+
+
+    }).catch(function(error) {
+      console.log(error);
+    });
+};
+
+// When the browser loads, makeResponsive() is called.
+makeResponsive();
+
+// When the browser window is resized, makeResponsive() is called.
+d3.select(window).on("resize", makeResponsive);
+
+
+
+
+
+
+
+
+///////////////////////////////////////////
 //textGroup.call(toolTip);
 
 // Retrieve data from the CSV file and execute everything below
@@ -148,7 +253,7 @@ d3.csv("assets/data/data.csv").then(function(demoData, err) {
   var xLinearScale = xScale(demoData, chosenXAxis, chartWidth);
 
   // Create y scale function
-  var yLinearScale = yScale(demoData, chosenYAxis, chartHeight);
+  var yLinearScale = yScale(demoData, chosenYAxis, height);
     .domain([0, d3.max(hairData, d => d.num_hits)])
     .range([height, 0]);
 
