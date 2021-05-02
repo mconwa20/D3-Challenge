@@ -27,6 +27,10 @@ function makeResponsive() {
   var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+  // Initial Params
+  var chosenXAxis = "poverty";
+  var chosenYAxis = "healthcare";
+
   // Read CSV
   d3.csv("assets/data/data.csv").then(function(demoData) {
 
@@ -36,32 +40,23 @@ function makeResponsive() {
       data.healthcare = +data.healthcare;
     });
 
-    // Initial Params
-    var chosenXAxis = "poverty";
-    var chosenYAxis = "healthcare";
-
     // create scales
-    var xLinearScale = d3.scaleLinear()
-      .domain([8.5, d3.max(demoData, d => d.[chosenXAxis]),
-      .range([0, width]);
-  
-    var yLinearScale = d3.scaleLinear()
-      .domain([3.5, d3.max(demoData, d => d.[chosenYAxis]),
-      .range([height, 0]);
+    var xLinearScale = xScale(demoData, chosenXAxis);
+    var yLinearScale = yScale(demoData, chosenYAxis);
 
   // function used for updating xAxis var upon click on axis label
-    var xAxis = d3.axisBottom(xLinearScale);
+    var bottomAxis = d3.axisBottom(xLinearScale);
 
   // function used for updating YAxis var upon click on axis label
-    var yAxis = d3.axisLeft(yLinearScale);
+    var leftAxis = d3.axisLeft(yLinearScale);
 
   //Append axis to the chartGroup
-  chartGroup.append("g")
-  .attr("transform", `translate(0, ${height})`)
-  .call(xAxis);
+  var xAxis = chartGroup.append("g")
+    .attr("transform", `translate(0, ${height})`)
+    .call(bottomAxis);
 
-  chartGroup.append("g")
-  .call(yAxis);
+  var yAxis = chartGroup.append("g")
+    .call(leftAxis);
 
   // append initial circles
   var circlesGroup = chartGroup.selectAll("circle")
@@ -77,7 +72,7 @@ function makeResponsive() {
   // append y axis
   chartGroup.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left)
+    .attr("y", 0 - margin.left + 40)
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em")
     .classed("class", "axisText")
@@ -85,7 +80,7 @@ function makeResponsive() {
 
   // append x axis
   chartGroup.append("text")
-    .attr("transform", `translate(${width / 2.5}, ${height + margin.top + 25})`)
+    .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
     .attr("class", "axisText")
     .text("Impoverished (%)");
   });
