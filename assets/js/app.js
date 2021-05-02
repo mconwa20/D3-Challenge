@@ -39,10 +39,13 @@ function makeResponsive() {
       data.poverty = +data.poverty;
       data.healthcare = +data.healthcare;
     });
-
     // create scales
-    var xLinearScale = xScale(demoData, chosenXAxis);
-    var yLinearScale = yScale(demoData, chosenYAxis);
+    var xLinearScale = d3.scaleLinear()
+      .domain([0, d3.max(demoData, d => d[chosenXAxis])])
+      .range([0, width]);
+    var yLinearScale = d3.scaleLinear()
+      .domain([0, d3.max(demoData, d => d[chosenYAxis])])
+      .range([height, 0]);
 
   // function used for updating xAxis var upon click on axis label
     var bottomAxis = d3.axisBottom(xLinearScale);
@@ -51,11 +54,11 @@ function makeResponsive() {
     var leftAxis = d3.axisLeft(yLinearScale);
 
   //Append axis to the chartGroup
-  var xAxis = chartGroup.append("g")
+  chartGroup.append("g")
     .attr("transform", `translate(0, ${height})`)
     .call(bottomAxis);
 
-  var yAxis = chartGroup.append("g")
+  hartGroup.append("g")
     .call(leftAxis);
 
   // append initial circles
