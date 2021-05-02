@@ -1,5 +1,5 @@
 // The code for the chart is wrapped inside a function that
-// automatically resizes the chart  
+// automatically resizes the chart  .
 function makeResponsive() {
 
   var svgWidth = 960;
